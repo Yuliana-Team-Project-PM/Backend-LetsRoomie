@@ -1,0 +1,449 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Find your ideal room and your ideal mate. So, let´s roomie",
+    "version": "1.0.0",
+    "title": "API-LetsRoomie"
+  },
+  "host": "api-letsroomie.herokuapp.com",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "users",
+      "description": "Operations on the user"
+    },
+    {
+      "name": "profiles",
+      "description": "Operations on the profiles"
+    },
+    {
+      "name": "uploadImages",
+      "description": "Operations to upload Images"
+    },
+    {
+      "name": "places",
+      "description": "Operations on places"
+    },
+    {
+      "name": "favorites",
+      "description": "Operations on favorites"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/auth/users": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "List all the users",
+        "description": "List all the users created in our app. If you pass a query /auth/users?_id=user_id, it returns the info of the user_id",
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "name": "user_id",
+            "type": "string",
+            "in": "query",
+            "required": false,
+            "description": "uid returned in auth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Error creating user"
+          }
+        }
+      }
+    },
+    "/auth/createUser": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Creates an user",
+        "description": "Creates an user in firebase and MongoDB",
+        "operationId": "createUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/createUser"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Error creating new user"
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Login a user",
+        "description": "Log a user with firebase and obtain user object from MongoDB",
+        "operationId": "authUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/userAuthenticated"
+            }
+          },
+          "500": {
+            "description": "Auth Error"
+          }
+        }
+      }
+    },
+    "/auth/{userId}": {
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Update phone number or name from a user",
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user to update",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfull operation",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "500": {
+            "description": "Error updating user"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Deletes a user ",
+        "operationId": "deleteUserById",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfull operation",
+            "schema": {
+              "$ref": "#/definitions/userDeleted"
+            }
+          },
+          "500": {
+            "description": "Error updating user"
+          }
+        }
+      }
+    },
+    "/api/profile/multipleUpload": {
+      "post": {
+        "tags": [
+          "uploadImages"
+        ],
+        "summary": "Update up to 8 photos of the profile",
+        "operationId": "uploadPhotos",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "galleryImage",
+            "in": "formData",
+            "description": "file to upload un format jpg/png",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successfull operation",
+            "schema": {
+              "$ref": "#/definitions/uploadImages"
+            }
+          },
+          "500": {
+            "description": "Error updating user"
+          }
+        }
+      }
+    },
+    "/api/profile/avatarUpload": {
+      "post": {
+        "tags": [
+          "uploadImages"
+        ],
+        "summary": "Upload the avatar picture",
+        "operationId": "avatarUpload",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "file to upload un format jpg/png",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successfull operation",
+            "schema": {
+              "$ref": "#/definitions/uploadAvatar"
+            }
+          },
+          "500": {
+            "description": "Error updating user"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "petstore_auth": {
+      "type": "oauth2",
+      "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
+      "flow": "implicit",
+      "scopes": {
+        "write:pets": "modify pets in your account",
+        "read:pets": "read your pets"
+      }
+    },
+    "api_key": {
+      "type": "apiKey",
+      "name": "api_key",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string"
+            },
+            "uid": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "createUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "userAuthenticated": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "uid": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "__v": {
+                  "type": "integer"
+                }
+              }
+            },
+            "token": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "authUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "userDeleted": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "_id": {
+              "type": "string"
+            },
+            "uid": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "__v": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "uploadImages": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "maxItems": 10
+        }
+      }
+    },
+    "uploadAvatar": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Castor Dams. Email us: castordams@gmail.com",
+    "url": "https://www.platzi.com"
+  }
+}
