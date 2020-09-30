@@ -12,8 +12,9 @@ const app = express();
 
 app.use(cors());
 
-
 db(config.dbUrl);
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
