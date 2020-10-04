@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-var Profile = mongoose.model('Profile')
+var User = mongoose.model('User')
 
 const place = new Schema({
     namePlace: { type: String, required: true },
@@ -8,7 +8,7 @@ const place = new Schema({
     city: { type: String, required: true },
     images: { type: Array, required: false },
     price: { type: Number, required: true },
-    avalaible: { type: Boolean, required: true },
+    available: { type: Boolean, required: true },
     furniture: { type: Array, required: true },
     wifi: { type: Boolean, required: true },
     bath: { type: Boolean, required: true },
@@ -18,7 +18,7 @@ const place = new Schema({
     closet: { type: Boolean, required: true },
     size: { type: Number, required: true },
     description: { type: String, required: true },
-    profile: { type: Schema.ObjectId, ref: 'Profile', required: true },
+    user: { type: Schema.ObjectId, ref: 'User', required: true },
 },
 {
     timestamps: true

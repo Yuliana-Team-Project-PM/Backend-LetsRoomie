@@ -13,10 +13,6 @@
       "description": "Operations on the user"
     },
     {
-      "name": "profiles",
-      "description": "Operations on the profiles"
-    },
-    {
       "name": "uploadImages",
       "description": "Operations to upload Images"
     },
@@ -30,40 +26,31 @@
     }
   ],
   "schemes": [
-    "http"
+    "https"
   ],
   "paths": {
-    "/auth/users": {
+    "/ishost": {
       "get": {
         "tags": [
           "users"
         ],
-        "summary": "List all the users",
-        "description": "List all the users created in our app. If you pass a query /auth/users?_id=user_id, it returns the info of the user_id",
-        "operationId": "getUsers",
-        "parameters": [
-          {
-            "name": "user_id",
-            "type": "string",
-            "in": "query",
-            "required": false,
-            "description": "uid returned in auth"
-          }
-        ],
+        "summary": "List all the hosts",
+        "description": "List all the hosts",
+        "operationId": "getHosts",
         "responses": {
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/User"
+              "$ref": "#/definitions/hosts"
             }
           },
-          "400": {
-            "description": "Error creating user"
+          "500": {
+            "description": "Unexpected error getting the hosts"
           }
         }
       }
     },
-    "/auth/createUser": {
+    "/createUser": {
       "post": {
         "tags": [
           "users"
@@ -88,7 +75,7 @@
           "201": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/User"
+              "$ref": "#/definitions/createdUser"
             }
           },
           "400": {
@@ -97,7 +84,7 @@
         }
       }
     },
-    "/auth/signin": {
+    "/signin": {
       "post": {
         "tags": [
           "users"
@@ -131,34 +118,37 @@
         }
       }
     },
-    "/auth/{userId}": {
-      "put": {
+    "/users": {
+      "get": {
         "tags": [
           "users"
         ],
-        "summary": "Update phone number or name from a user",
-        "operationId": "getUserById",
+        "summary": "List all the users",
+        "description": "List all the users created in our app. If you pass a query /users?_id=user_id, it returns the info of the user_id",
+        "operationId": "getUsers",
         "parameters": [
           {
-            "name": "userId",
-            "in": "path",
-            "description": "Id of user to update",
-            "required": true,
-            "type": "string"
+            "name": "user_id",
+            "type": "string",
+            "in": "query",
+            "required": false,
+            "description": "_id of the user"
           }
         ],
         "responses": {
           "200": {
-            "description": "successfull operation",
+            "description": "successful operation",
             "schema": {
               "$ref": "#/definitions/User"
             }
           },
-          "500": {
-            "description": "Error updating user"
+          "400": {
+            "description": "Error creating user"
           }
         }
-      },
+      }
+    },
+    "/users/{userId}": {
       "delete": {
         "tags": [
           "users"
@@ -181,8 +171,133 @@
               "$ref": "#/definitions/userDeleted"
             }
           },
-          "500": {
+          "400": {
+            "description": "Error deleting user"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Updates a user",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of user to delete",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/createUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfull operation",
+            "schema": {
+              "$ref": "#/definitions/userDeleted"
+            }
+          },
+          "400": {
             "description": "Error updating user"
+          }
+        }
+      }
+    },
+    "/user/{email}": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get user by email",
+        "description": "Get an user passing the email in path",
+        "operationId": "getUserByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "Email of user to get",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfull operation",
+            "schema": {
+              "$ref": "#/definitions/userDeleted"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
+    "/contact-wapp": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get the link to contact through whatsapp",
+        "description": "Get the link to contact the host passing the host id in the query.",
+        "operationId": "getWhatsAppLink",
+        "parameters": [
+          {
+            "name": "_id",
+            "type": "string",
+            "in": "query",
+            "required": true,
+            "description": "hostId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Whatsapp"
+            }
+          },
+          "400": {
+            "description": "Error creating the link"
+          }
+        }
+      }
+    },
+    "/contact-mail": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get the link to contact through Mail",
+        "description": "Get the link to contact the host passing the host id in the query.",
+        "operationId": "getMailLink",
+        "parameters": [
+          {
+            "name": "_id",
+            "type": "string",
+            "in": "query",
+            "required": true,
+            "description": "hostId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/MailTo"
+            }
+          },
+          "400": {
+            "description": "Error creating the link"
           }
         }
       }
@@ -250,25 +365,622 @@
           }
         }
       }
-    }
-  },
-  "securityDefinitions": {
-    "petstore_auth": {
-      "type": "oauth2",
-      "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
-      "flow": "implicit",
-      "scopes": {
-        "write:pets": "modify pets in your account",
-        "read:pets": "read your pets"
+    },
+    "/place": {
+      "get": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Get all the places",
+        "description": "Get all the places from the app",
+        "operationId": "getPlaces",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/getPlaces"
+            }
+          },
+          "400": {
+            "description": "Error creating the link"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Create a place",
+        "description": "Create a place for LetsRoomie",
+        "operationId": "createPlace",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/createPlace"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/getPlaces"
+            }
+          },
+          "400": {
+            "description": "Error creating place"
+          }
+        }
       }
     },
-    "api_key": {
-      "type": "apiKey",
-      "name": "api_key",
-      "in": "header"
+    "/placea": {
+      "get": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Get all the available places",
+        "description": "List all the available places in LetsRoomie",
+        "operationId": "getAvailablePlaces",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/getPlaces"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
+    "/place/{placeId}": {
+      "get": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Get a specific place",
+        "description": "Get a specific place, passing the placeId in the params",
+        "operationId": "getOnePlace",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "placeId",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/getPlaces"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Delete a place",
+        "description": "Deletes a specific place. Pass the id in the path",
+        "operationId": "deletePlace",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "placeId",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Update a place",
+        "description": "Updates a place passing the id in the path and the token in the header",
+        "operationId": "updatePlace",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/updatePlace"
+            }
+          },
+          {
+            "in": "path",
+            "name": "placeId",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/getPlaces"
+            }
+          },
+          "400": {
+            "description": "Error updating the place"
+          }
+        }
+      }
+    },
+    "/placec/{city}": {
+      "get": {
+        "tags": [
+          "places"
+        ],
+        "summary": "Get the places of a specific city",
+        "description": "Get the places of a given city. Pass the city in the path.",
+        "operationId": "getPlacesFromCity",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "city",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/getPlaces"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
+    "/fav": {
+      "get": {
+        "tags": [
+          "favorites"
+        ],
+        "summary": "Get favorites",
+        "description": "Get all the favorites from a user passing the userId in the query",
+        "operationId": "getFavorites",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "user",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success operation",
+            "schema": {
+              "$ref": "#/definitions/getFavorites"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "favorites"
+        ],
+        "summary": "Create a favorite",
+        "description": "Create a favorite passing the userId and the placeId. If they already exist in DB, it returns: Place and user already exist",
+        "operationId": "createFavorite",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/createFavorite"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/createdFavorite"
+            }
+          },
+          "500": {
+            "description": "Error creating favorite"
+          }
+        }
+      }
+    },
+    "/fav/{favId}": {
+      "get": {
+        "tags": [
+          "favorites"
+        ],
+        "summary": "Get a specific favorite",
+        "operationId": "getOneFavorite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "favId",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/getFavorites"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "favorites"
+        ],
+        "summary": "Delete a specific favorite",
+        "operationId": "deleteOneFavorite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "favId",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "favorites"
+        ],
+        "summary": "Updated a specific favorite",
+        "operationId": "updateFavorite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "favId",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/createdFavorite"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      }
+    },
+    "/fav/place/{placeId}": {
+      "get": {
+        "tags": [
+          "favorites"
+        ],
+        "summary": "Get favorites from a place",
+        "description": "Get all the favorites from a place passing the placeId in path",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "placeId",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "access-token",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/getPlaceFavorites"
+            }
+          },
+          "500": {
+            "description": "Unexpected error"
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "hosts": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "avatar": {
+                "type": "string"
+              },
+              "isHost": {
+                "type": "boolean"
+              },
+              "about": {
+                "type": "string"
+              },
+              "movietheater": {
+                "type": "boolean"
+              },
+              "literature": {
+                "type": "boolean"
+              },
+              "sports": {
+                "type": "boolean"
+              },
+              "parties": {
+                "type": "boolean"
+              },
+              "study": {
+                "type": "boolean"
+              },
+              "music": {
+                "type": "boolean"
+              },
+              "friends": {
+                "type": "boolean"
+              },
+              "travel": {
+                "type": "boolean"
+              },
+              "art": {
+                "type": "boolean"
+              },
+              "work": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "createUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "isHost": {
+          "type": "boolean"
+        },
+        "about": {
+          "type": "string"
+        },
+        "movietheater": {
+          "type": "boolean"
+        },
+        "literature": {
+          "type": "boolean"
+        },
+        "sports": {
+          "type": "boolean"
+        },
+        "parties": {
+          "type": "boolean"
+        },
+        "study": {
+          "type": "boolean"
+        },
+        "music": {
+          "type": "boolean"
+        },
+        "friends": {
+          "type": "boolean"
+        },
+        "travel": {
+          "type": "boolean"
+        },
+        "art": {
+          "type": "boolean"
+        },
+        "work": {
+          "type": "boolean"
+        }
+      }
+    },
+    "createdUser": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "uid": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "avatar": {
+                "type": "string"
+              },
+              "isHost": {
+                "type": "boolean"
+              },
+              "about": {
+                "type": "string"
+              },
+              "movietheater": {
+                "type": "boolean"
+              },
+              "literature": {
+                "type": "boolean"
+              },
+              "sports": {
+                "type": "boolean"
+              },
+              "parties": {
+                "type": "boolean"
+              },
+              "study": {
+                "type": "boolean"
+              },
+              "music": {
+                "type": "boolean"
+              },
+              "friends": {
+                "type": "boolean"
+              },
+              "travel": {
+                "type": "boolean"
+              },
+              "art": {
+                "type": "boolean"
+              },
+              "work": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
     "User": {
       "type": "object",
       "properties": {
@@ -297,19 +1009,67 @@
         }
       }
     },
-    "createUser": {
+    "singleUser": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "uid": {
+          "type": "string"
+        },
         "email": {
           "type": "string"
         },
         "phone": {
           "type": "string"
         },
-        "password": {
+        "name": {
           "type": "string"
         },
-        "name": {
+        "avatar": {
+          "type": "string"
+        },
+        "isHost": {
+          "type": "boolean"
+        },
+        "about": {
+          "type": "string"
+        },
+        "movietheater": {
+          "type": "boolean"
+        },
+        "literature": {
+          "type": "boolean"
+        },
+        "sports": {
+          "type": "boolean"
+        },
+        "parties": {
+          "type": "boolean"
+        },
+        "study": {
+          "type": "boolean"
+        },
+        "music": {
+          "type": "boolean"
+        },
+        "friends": {
+          "type": "boolean"
+        },
+        "travel": {
+          "type": "boolean"
+        },
+        "art": {
+          "type": "boolean"
+        },
+        "work": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
           "type": "string"
         }
       }
@@ -317,8 +1077,8 @@
     "userAuthenticated": {
       "type": "object",
       "properties": {
-        "status": {
-          "type": "integer"
+        "error": {
+          "type": "string"
         },
         "body": {
           "type": "object",
@@ -339,6 +1099,51 @@
                   "type": "string"
                 },
                 "name": {
+                  "type": "string"
+                },
+                "avatar": {
+                  "type": "string"
+                },
+                "isHost": {
+                  "type": "boolean"
+                },
+                "about": {
+                  "type": "string"
+                },
+                "movietheater": {
+                  "type": "boolean"
+                },
+                "literature": {
+                  "type": "boolean"
+                },
+                "sports": {
+                  "type": "boolean"
+                },
+                "parties": {
+                  "type": "boolean"
+                },
+                "study": {
+                  "type": "boolean"
+                },
+                "music": {
+                  "type": "boolean"
+                },
+                "friends": {
+                  "type": "boolean"
+                },
+                "travel": {
+                  "type": "boolean"
+                },
+                "art": {
+                  "type": "boolean"
+                },
+                "work": {
+                  "type": "boolean"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
                   "type": "string"
                 },
                 "__v": {
@@ -376,23 +1181,73 @@
             "status": {
               "type": "string"
             },
-            "_id": {
-              "type": "string"
-            },
-            "uid": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "phone": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "__v": {
-              "type": "integer"
+            "data": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "uid": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "avatar": {
+                  "type": "string"
+                },
+                "isHost": {
+                  "type": "string"
+                },
+                "about": {
+                  "type": "string"
+                },
+                "movietheater": {
+                  "type": "boolean"
+                },
+                "literature": {
+                  "type": "boolean"
+                },
+                "sports": {
+                  "type": "boolean"
+                },
+                "parties": {
+                  "type": "boolean"
+                },
+                "study": {
+                  "type": "boolean"
+                },
+                "music": {
+                  "type": "boolean"
+                },
+                "friends": {
+                  "type": "boolean"
+                },
+                "travel": {
+                  "type": "boolean"
+                },
+                "art": {
+                  "type": "boolean"
+                },
+                "work": {
+                  "type": "boolean"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "__v": {
+                  "type": "integer"
+                }
+              }
             }
           }
         }
@@ -410,7 +1265,7 @@
             "type": "string"
           },
           "minItems": 2,
-          "maxItems": 10
+          "maxItems": 8
         }
       }
     },
@@ -430,6 +1285,166 @@
         }
       }
     },
+    "Whatsapp": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      }
+    },
+    "MailTo": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      }
+    },
+    "getPlaces": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "images": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "furniture": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "_id": {
+              "type": "string"
+            },
+            "namePlace": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "city": {
+              "type": "string"
+            },
+            "price": {
+              "type": "integer"
+            },
+            "available": {
+              "type": "boolean"
+            },
+            "wifi": {
+              "type": "boolean"
+            },
+            "bath": {
+              "type": "boolean"
+            },
+            "parking": {
+              "type": "boolean"
+            },
+            "tv": {
+              "type": "boolean"
+            },
+            "cleaning": {
+              "type": "boolean"
+            },
+            "closet": {
+              "type": "boolean"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "description": {
+              "type": "string"
+            },
+            "user": {
+              "$ref": "#/definitions/singleUser"
+            },
+            "createdAt": {
+              "type": "string"
+            },
+            "updatedAt": {
+              "type": "string"
+            },
+            "__v": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "createPlace": {
+      "type": "object",
+      "properties": {
+        "namePlace": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "price": {
+          "type": "integer"
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "furniture": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "wifi": {
+          "type": "boolean"
+        },
+        "bath": {
+          "type": "boolean"
+        },
+        "parking": {
+          "type": "boolean"
+        },
+        "tv": {
+          "type": "boolean"
+        },
+        "cleaning": {
+          "type": "boolean"
+        },
+        "closet": {
+          "type": "boolean"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        }
+      }
+    },
     "ApiResponse": {
       "type": "object",
       "properties": {
@@ -437,7 +1452,167 @@
           "type": "string"
         },
         "body": {
-          "type": "object"
+          "type": "string"
+        }
+      }
+    },
+    "updatePlace": {
+      "type": "object",
+      "properties": {
+        "namePlace": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "price": {
+          "type": "integer"
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "furniture": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "wifi": {
+          "type": "boolean"
+        },
+        "bath": {
+          "type": "boolean"
+        },
+        "parking": {
+          "type": "boolean"
+        },
+        "tv": {
+          "type": "boolean"
+        },
+        "cleaning": {
+          "type": "boolean"
+        },
+        "closet": {
+          "type": "boolean"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "getFavorites": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "place": {
+                "type": "object"
+              },
+              "user": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              },
+              "__v": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "getPlaceFavorites": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "place": {
+                "type": "object"
+              },
+              "user": {
+                "type": "string"
+              },
+              "__v": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "createFavorite": {
+      "type": "object",
+      "properties": {
+        "place": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        }
+      }
+    },
+    "createdFavorite": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "body": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string"
+            },
+            "place": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string"
+            },
+            "updatedAt": {
+              "type": "string"
+            },
+            "__v": {
+              "type": "integer"
+            }
+          }
         }
       }
     }

@@ -1,27 +1,22 @@
 const Place = require('./model');
 const placeController = {};
+const response = require('../../network/response');
 
 placeController.getPlaces= async (req, res, next) => {
   try {
-    const places = await Place.find()//.populate('user')
-    res.json({
-      status: 200,
-      body: places
-    })
+    const places = await Place.find().populate('user');
+    response.success(req, res, places, 200);
   } catch (error) {
-    next(error)
+    response.error(req, res, "Unexpected error", 500, error.message);
   }
 }
 
-placeController.getPlacesAvalaible= async (req, res, next) => {
+placeController.getPlacesAvailable= async (req, res, next) => {
   try {
-    const places = await Place.find({avalaible:true}).populate('profile')
-        res.json({
-          status: 200,
-          body: places
-        }) 
-    }catch (error) {
-    next(error)
+    const places = await Place.find({available:true}).populate('user');
+    response.success(req, res, places, 200);
+    } catch (error) {
+    response.error(req, res, "Unexpected error", 500, error.message);
   }
 }
 
@@ -29,22 +24,16 @@ placeController.getPlacesAvalaible= async (req, res, next) => {
 
 placeController.getOnePlace = async (req, res,next) =>{
   try {
-    const place = await Place.findById(req.params.id)
-    res.json({
-      status:200,
-      body:place
-    })
+    const place = await Place.findById(req.params.id).populate('user');
+    response.success(req, res, place, 200);
   } catch (error) {
-    next(error)
+    response.error(req, res, "Unexpected error", 500, error.message);
   }
 }
 placeController.getOnePlaceCity = async (req, res,next) =>{
   try {
-    const place = await Place.find({city:req.params.city})
-    res.json({
-      status:200,
-      body:place
-    })
+    const place = await Place.find({city:req.params.city}).populate('user');
+    response.success(req, res, place, 200);
   } catch (error) {
     next(error)
   }
@@ -59,7 +48,7 @@ placeController.addPlace = async (req, res, next) => {
             city: req.body.city,
             images: req.body.images,
             price: req.body.price,
-            avalaible: req.body.avalaible,
+            available: req.body.available,
             furniture: req.body.furniture,
             wifi: req.body.wifi,
             bath: req.body.bath,
@@ -69,17 +58,14 @@ placeController.addPlace = async (req, res, next) => {
             closet: req.body.closet,
             size: req.body.size,
             description: req.body.description,
-            profile: req.body.profile,
+            user: req.body.user,
         })
         await place.save()
-        res.json({
-          status: 201,
-          body: place
-        })
+        response.success(req, res, place, 201);
         
         
       } catch (error) {
-        next(error)
+        response.error(req, res, "Error creating place", 500, error.message);
       }
 }
 
@@ -91,7 +77,7 @@ placeController.updatePlace = async(req, res, next) => {
       city: req.body.city,
       images: req.body.images,
       price: req.body.price,
-      avalaible: req.body.avalaible,
+      available: req.body.available,
       furniture: req.body.furniture,
       wifi: req.body.wifi,
       bath: req.body.bath,
@@ -101,7 +87,7 @@ placeController.updatePlace = async(req, res, next) => {
       closet: req.body.closet,
       size: req.body.size,
       description: req.body.description,
-      profile: req.body.profile,
+      user: req.body.user,
       
     }
     await Place.findByIdAndUpdate(
@@ -109,25 +95,20 @@ placeController.updatePlace = async(req, res, next) => {
       { $set: place },
       { omitUndefined: true, upsert: true }
     )
-    res.json({
-      status: 200,
-      message: 'Place updated',
-      body: place
-    })
+
+    const placeUpdated = await Place.findById(req.params.id).populate('user');
+    response.success(req, res, placeUpdated, 200);
   } catch (error) {
-    next(error)
+    response.error(req, res, "Error updating the place", 400, error.message);
   }
 }
 
 placeController.deletePlace = async(req, res, next) => {
   try{
     await Place.findByIdAndRemove(req.params.id)
-    res.json({
-      status: 200,
-      message: `Place ${req.params.id} deleted`
-    })
+    response.success(req, res, `Place ${req.params.id} deleted`, 200);
   }catch(error){
-    next(error)
+    response.error(req, res, "Unexpected error", 500, error.message);
   }
 }
 

@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 
 const config = require('../../config');
 
+router.get('/ishost', controller.getUserIsHost)
 //Create user
 router.post('/createUser', async (req, res) => {
   try {
@@ -19,6 +20,19 @@ router.post('/createUser', async (req, res) => {
       email: req.body.email,
       phone: req.body.phone,
       name: req.body.name,
+      avatar: req.body.avatar,
+      isHost: req.body.isHost,
+      about: req.body.about,
+      movietheater: req.body.movietheater,
+      literature: req.body.literature,
+      sports: req.body.sports,
+      parties: req.body.parties,
+      study: req.body.study,
+      music: req.body.music,
+      friends: req.body.friends,
+      travel: req.body.travel,
+      art: req.body.art,
+      work: req.body.work,
     };
 
     const user = await controller.addUser(newUser);
@@ -26,7 +40,7 @@ router.post('/createUser', async (req, res) => {
     response.success(req, res, user, 201);
     console.log('[create newUser]:', user.email);
   } catch (e) {
-    response.error(req, res, 'Error creating newUser', 400, e.message);
+    response.error(req, res, e.message, 400, e.message);
   }
 });
 
@@ -41,21 +55,15 @@ router.post('/signin', async (req, res) => {
     const token = jwt.sign(payload, config.llave, {
       expiresIn: 10000,
     });
-    res.json({
-      status: 200,
-      body: user,
-      token: token,
-    });
+    const data = {
+      user,
+      token
+    }
+    response.success(req, res, data, 200);
   } catch (err) {
     response.error(req, res, 'Auth Error', 500, err.message);
   }
 });
-
-router.post('/signout', async (req,res) =>{
-  console.log('entre aca')
-  controller.logout
-  res.json('Logout')
-})
 
 //Get users
 router.get('/users', function (req, res) {
@@ -70,21 +78,9 @@ router.get('/users', function (req, res) {
     });
 });
 
-// Get current user
-router.get('/current-user', function (req, res) {
-  const userId = req.body._id || null;
-  controller
-    .getUsers(userId)
-    .then((user) => {
-      response.success(req, res, user, 200);
-    })
-    .catch((error) =>
-      response.error(req, res, 'Error getting the current user', 500, error)
-    );
-});
 
 // Delete a user
-router.delete('/:id', function (req, res) {
+router.delete('/users/:id', function (req, res) {
   const userId = req.params.id;
   controller
     .deleteUser(userId)
@@ -94,7 +90,7 @@ router.delete('/:id', function (req, res) {
           req,
           res,
           "User doesn't exist",
-          403,
+          400,
           "User id doesn't exist in MongoDB"
         );
       } else {
@@ -107,7 +103,7 @@ router.delete('/:id', function (req, res) {
 });
 
 //update a user
-router.put('/:id', function (req, res) {
+router.put('/users/:id', function (req, res) {
   const userId = req.params.id;
   controller
     .updateUser(userId, req.body)
@@ -118,5 +114,49 @@ router.put('/:id', function (req, res) {
       response.error(req, res, 'Error updating user', 500, e.message);
     });
 });
+
+//Get user by email
+router.get('/user/:email', function (req, res) {
+  const filterUsers = req.params.email|| null;
+  controller
+    .getUsersByEmail(filterUsers)
+    .then((usersList) => {
+      response.success(req, res, usersList, 200);
+    })
+    .catch((e) => {
+      response.error(req, res, 'Unexpected error', 500, e);
+    });
+});
+
+//Send Whatsapp to a user
+router.get('/contact-wapp', function(req, res) {
+  const userId = req.query._id;
+  controller.getUsers(userId)
+    .then(user => {
+      const phoneNumber = user[0].phone.replace(' ', '');
+      const message = 'I´m interested in be your roomie.'
+      url = `wa.me/${phoneNumber}?text=${message}`
+      response.success(req, res, url, 200);
+    })
+    .catch(e => {
+      response.error(req, res, e.message, 400, e);
+    })
+})
+
+//Send Mail to a user
+router.get('/contact-mail', function(req, res) {
+  const userId = req.query._id;
+  controller.getUsers(userId)
+    .then(user => {
+      const emailAdress = user[0].email;
+      const subject = "Lets Rommie"
+      const message = 'I´m interested in be your roomie.'
+      url = `mailto:${emailAdress}?subject=${subject}&body=${message}`
+      response.success(req, res, url, 200);
+    })
+    .catch(e => {
+      response.error(req, res, e.message, 400, e);
+    })
+})
 
 module.exports = router;
